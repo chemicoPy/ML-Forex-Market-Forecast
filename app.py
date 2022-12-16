@@ -522,3 +522,16 @@ if config["plots"]["show_plots"]:
     st.write(fig)
 
 st.write("Predicted close price of the next trading time:", round(prediction, 2))
+
+
+
+# ---------------Model_accuracy------------------ 
+
+error_rate = np.mean(np.abs((data_y_val-predicted_val)/data_y_val))*100
+print(f"Error rate = {error_rate:.2f} %")
+accuracy_score = 100 - error_rate
+st.write(f"Accuracy score = {accuracy_score:.2f} %")
+
+
+
+
