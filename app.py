@@ -197,6 +197,139 @@ def download_data(config, plot=False):
 
 data_date, data_close_price, num_data_points = download_data(config, plot=config["plots"]["show_plots"])
 
+# ---------------Normalizer------------------
+
+class Normalizer():
+    def __init__(self):
+        self.mu = None
+        self.sd = None
+
+    def fit_transform(self, x):
+        self.mu = np.mean(x, axis=(0), keepdims=True)
+        self.sd = np.std(x, axis=(0), keepdims=True)
+        normalized_x = (x - self.mu)/self.sd
+        return normalized_x
+
+    def inverse_transform(self, x):
+        return (x*self.sd) + self.mu
+
+# normalize
+scaler = Normalizer()
+normalized_data_close_price = scaler.fit_transform(data_close_price)
+
+def prepare_data_x(x, window_size):
+    # perform windowing
+    n_row = x.shape[0] - window_size + 1
+    output = np.lib.stride_tricks.as_strided(x, shape=(n_row,window_size), strides=(x.strides[0],x.strides[0]))
+    return output[:-1], output[-1]
+
+def prepare_data_y(x, window_size):
+    # # perform simple moving average
+    # output = np.convolve(x, np.ones(window_size), 'valid') / window_size
+
+    # use the next day as label
+    output = x[window_size:]
+    return output
+
+def prepare_data(normalized_data_close_price, config, plot=False):
+    data_x, data_x_unseen = prepare_data_x(normalized_data_close_price, window_size=config["data"]["window_size"])
+    data_y = prepare_data_y(normalized_data_close_price, window_size=config["data"]["window_size"])
+
+    # split dataset
+    
+    split_index = int(data_y.shape[0]*config["data"]["train_split_size"])
+    data_x_train = data_x[:split_index]
+    data_x_val = data_x[split_index:]
+    data_y_train = data_y[:split_index]
+    data_y_val = data_y[split_index:]
+
+    if plot:
+        # prepare data for plotting
+
+        to_plot_data_y_train = np.zeros(num_data_points)
+        to_plot_data_y_val = np.zeros(num_data_points)
+
+        to_plot_data_y_train[config["data"]["window_size"]:split_index+config["data"]["window_size"]] = scaler.inverse_transform(data_y_train)
+        to_plot_data_y_val[split_index+config["data"]["window_size"]:] = scaler.inverse_transform(data_y_val)
+
+        to_plot_data_y_train = np.where(to_plot_data_y_train == 0, None, to_plot_data_y_train)
+        to_plot_data_y_val = np.where(to_plot_data_y_val == 0, None, to_plot_data_y_val)
+
+        ## plots
+
+        fig = figure(figsize=(25, 5), dpi=80)
+        fig.patch.set_facecolor((1.0, 1.0, 1.0))
+        plt.plot(data_date, to_plot_data_y_train, label="Prices (train)", color=config["plots"]["color_train"])
+        plt.plot(data_date, to_plot_data_y_val, label="Prices (validation)", color=config["plots"]["color_val"])
+        xticks = [data_date[i] if ((i%config["plots"]["xticks_interval"]==0 and (num_data_points-i) > config["plots"]["xticks_interval"]) or i==num_data_points-1) else None for i in range(num_data_points)] # make x ticks nice
+        x = np.arange(0,len(xticks))
+        plt.xticks(x, xticks, rotation='vertical')
+        plt.title("Close prices for " + "the data" + " - showing training and validation data")
+        plt.grid(b=None, which='major', axis='y', linestyle='--')
+        plt.legend()
+        plt.show()
+
+    return split_index, data_x_train, data_y_train, data_x_val, data_y_val, data_x_unseen
+
+split_index, data_x_train, data_y_train, data_x_val, data_y_val, data_x_unseen = prepare_data(normalized_data_close_price, config, plot=config["plots"]["show_plots"])
 
 
-   
+class TimeSeriesDataset(Dataset):
+    def __init__(self, x, y):
+        x = np.expand_dims(x, 2) # in our case, we have only 1 feature, so we need to convert `x` into [batch, sequence, features] for LSTM
+        self.x = x.astype(np.float32)
+        self.y = y.astype(np.float32)
+        
+    def __len__(self):
+        return len(self.x)
+
+    def __getitem__(self, idx):
+        return (self.x[idx], self.y[idx])
+
+dataset_train = TimeSeriesDataset(data_x_train, data_y_train)
+dataset_val = TimeSeriesDataset(data_x_val, data_y_val)
+
+# ---------------Defining the LSTM Model------------------
+
+class LSTMModel(nn.Module):
+    def __init__(self, input_size=1, hidden_layer_size=32, num_layers=2, output_size=1, dropout=0.2):
+        super().__init__()
+        self.hidden_layer_size = hidden_layer_size
+
+        self.linear_1 = nn.Linear(input_size, hidden_layer_size)
+        self.relu = nn.ReLU()
+        self.lstm = nn.LSTM(hidden_layer_size, hidden_size=self.hidden_layer_size, num_layers=num_layers, batch_first=True)
+        self.dropout = nn.Dropout(dropout)
+        self.linear_2 = nn.Linear(num_layers*hidden_layer_size, output_size)
+        
+        self.init_weights()
+
+    def init_weights(self):
+        for name, param in self.lstm.named_parameters():
+            if 'bias' in name:
+                 nn.init.constant_(param, 0.0)
+            elif 'weight_ih' in name:
+                 nn.init.kaiming_normal_(param)
+            elif 'weight_hh' in name:
+                 nn.init.orthogonal_(param)
+
+    def forward(self, x):
+        batchsize = x.shape[0]
+
+        # layer 1
+        x = self.linear_1(x)
+        x = self.relu(x)
+        
+        # LSTM layer
+        lstm_out, (h_n, c_n) = self.lstm(x)
+
+        # reshape output from hidden cell into [batch, features] for `linear_2`
+        x = h_n.permute(1, 0, 2).reshape(batchsize, -1) 
+        
+        # layer 2
+        x = self.dropout(x)
+        predictions = self.linear_2(x)
+        return predictions[:,-1]
+
+model = LSTMModel(input_size=config["model"]["input_size"], hidden_layer_size=config["model"]["lstm_size"], num_layers=config["model"]["num_lstm_layers"], output_size=1, dropout=config["model"]["dropout"])
+model = model.to(config["training"]["device"])
