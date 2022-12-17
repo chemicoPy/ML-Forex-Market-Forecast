@@ -32,9 +32,6 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
 
-#st.write("All libraries loaded")
-
-
 # Desiging & implementing changes to the standard streamlit UI/UX
 st.set_page_config(page_icon="img/page_icon.png")    #Logo
 st.markdown('''<style>.css-1egvi7u {margin-top: -4rem;}</style>''',
