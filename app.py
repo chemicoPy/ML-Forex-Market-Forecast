@@ -156,13 +156,17 @@ st.write("\n")  # add spacing
 
 #API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OePoBiGZhsN57a4OYrFH&level=3"
 
-API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OePoBiGZhsN57a4OYrFH&level=3"
-r = requests.get(API_URL)
-resp = "response"
-json = r.json()
-df = pd.DataFrame(json[resp]).T
-df.reset_index(inplace=True)
-df['c'] = pd.to_numeric(df['c'], errors='coerce')
+if symb =="" and time_int=="":
+    st.write("You need to select the options at the sidebar to contiune...")
+
+else:
+    API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OePoBiGZhsN57a4OYrFH&level=3"
+    r = requests.get(API_URL)
+    resp = "response"
+    json = r.json()
+    df = pd.DataFrame(json[resp]).T
+    df.reset_index(inplace=True)
+    df['c'] = pd.to_numeric(df['c'], errors='coerce')
     
 def download_data(config, plot=False):
     #Date and reverse - confirm if it was reversed or not in the sample script i'm using. if it was, use the commented version in the next line
