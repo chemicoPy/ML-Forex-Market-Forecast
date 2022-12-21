@@ -526,7 +526,7 @@ if config["plots"]["show_plots"]:
     st.subheader("Predicting future forex prices")
     st.write(fig)
 
-st.write("Predicted close price of the next trading time:", round(prediction, 2))
+st.write("Predicted close price of the next trading time:", prediction)
 
 
 
