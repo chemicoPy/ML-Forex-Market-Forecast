@@ -134,7 +134,7 @@ st.sidebar.markdown("## Select Forex pair & Interval below") # add a title to th
   
 symb = st.sidebar.selectbox(
         '', ["Select Forex Pair of interest", "XAU/USD","BTC/USD","ETH/USD","DOGE/USD", "GBP/USD", "GBP/JPY", 
-             "USD/JPY", "EUR//USD", "NZD/USD", "EUR/AUD", "GBP/AUD", "USD/CAD"], index=0)
+             "USD/JPY", "EUR/USD", "NZD/USD", "EUR/AUD", "GBP/AUD", "USD/CAD"], index=0)
   
 time_int = st.sidebar.selectbox(
         '', ["Interval of interest", "1m","5m","15m","30m","1h","2h","1d","1w", "month"], index=0)
