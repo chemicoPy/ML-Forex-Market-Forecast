@@ -92,7 +92,7 @@ config = {
     "training": {
         "device": "cpu", # "cuda" or "cpu"
         "batch_size": 64,
-        "num_epoch": 100,
+        "num_epoch": 50,
         "learning_rate": 0.01,
         "scheduler_step_size": 40,
     }
