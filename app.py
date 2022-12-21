@@ -124,7 +124,8 @@ st.sidebar.markdown(
             """
      ----------
     ## Project Overview
-    ML-Forex-Market-Forecast is a ...
+    ML-Forex-Market-Forecast is a project using LSTM approach in predicting the price & position of the next candle close for intervals: 
+    1-min, 5-min, 15-min, 30-min, 1h, 2h, 4h, 5h, 1d, 1wk, monthly – via FCSAPI real-time & historical data. 
     """)    
 
    
