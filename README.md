@@ -4,7 +4,7 @@
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
 # Project Overview
-ML-Forex-Market-Forecast is a project using LSTM approach in predicting the price & position of the next candle close – via FCSAPI real-time & historical data!
+ML Forex Market Forecast is a project using LSTM approach in predicting the price & position of the next candle close – via FCSAPI real-time & historical data!
 
 Intervals: 1-min, 5-min, 15-min, 30-min, 1h, 2h, 4h, 5h, 1d, 1wk, monthly
 Forex pairs: "XAU/USD","BTC/USD","ETH/USD","DOGE/USD", "GBP/USD", "GBP/JPY", "USD/JPY", "EUR/USD", 
