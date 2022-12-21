@@ -529,7 +529,7 @@ if config["plots"]["show_plots"]:
 if symb=="GBP/USD":
     st.write("Predicted close price of the next trading time:", round(prediction, 5))
     
-elif symb =="AUD/JPY" or symb=="CHF/JPY" or symb=="EUR/JPY" or symb=="NZD/JPY" or symb=="USD/JPY", symb=="GBP/JPY" or symb=="CAD/JPY":
+elif symb =="AUD/JPY" or symb=="CHF/JPY" or symb=="EUR/JPY" or symb=="NZD/JPY" or symb=="USD/JPY" or symb=="GBP/JPY" or symb=="CAD/JPY":
     st.write("Predicted close price of the next trading time:", round(prediction, 3))
 
 else:
