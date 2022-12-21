@@ -526,8 +526,14 @@ if config["plots"]["show_plots"]:
     st.subheader("Predicting future forex prices")
     st.write(fig)
 
-st.write("Predicted close price of the next trading time:", prediction)
+if symb=="GBP/USD":
+    st.write("Predicted close price of the next trading time:", round(prediction, 5))
+    
+elif symb =="AUD/JPY" or symb=="CHF/JPY" or symb=="EUR/JPY" or symb=="NZD/JPY" or symb=="USD/JPY", symb=="GBP/JPY" or symb=="CAD/JPY":
+    st.write("Predicted close price of the next trading time:", round(prediction, 3))
 
+else:
+    st.write("Predicted close price of the next trading time:", round(prediction, 4))
 
 
 # ---------------Model_accuracy------------------ 
