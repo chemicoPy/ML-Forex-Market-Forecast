@@ -164,7 +164,7 @@ if symb =="" and time_int=="":
     st.write("You need to select the options at the sidebar to contiune...")
 
 else:
-    API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OePoBiGZhsN57a4OYrFH&level=3"
+    API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OF8Na63W4WRiG5A24Hr3M&level=3"
     r = requests.get(API_URL)
     resp = "response"
     json = r.json()
