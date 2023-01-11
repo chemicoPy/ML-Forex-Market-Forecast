@@ -160,8 +160,8 @@ st.write("\n")  # add spacing
 
 #API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=OePoBiGZhsN57a4OYrFH&level=3"
 
-if symb =="" and time_int=="":
-    st.write("You need to select the options at the sidebar to contiune...")
+if symb =="Select Forex Pair of interest" and time_int=="Interval of interest":
+    st.write("You need to select the options at the sidebar to continue...")
 
 else:
     API_URL = "https://fcsapi.com/api-v3/forex/history?symbol="+symb+"&period="+time_int+"&access_key=y6JZgoXNuhVjNaSuTjQ9iH&level=3"
