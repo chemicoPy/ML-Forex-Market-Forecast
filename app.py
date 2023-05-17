@@ -27,7 +27,7 @@ from pandas import DataFrame, Series
 from numpy.random import randn
 import requests
 import io
-from pandas.io.json import json_normalize
+
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
